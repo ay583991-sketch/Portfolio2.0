@@ -4,18 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#050505" />
+    <meta name="author" content="Amit Yadav" />
     <meta
       name="description"
       content="Explore Amit Yadav's web development portfolio, skills, and projects."
     />
+
+    <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Amit Yadav | Full Stack Developer" />
     <meta
       property="og:description"
       content="Explore Amit Yadav's web development projects and technical skills."
     />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Amit Yadav | Full Stack Developer" />
+    <meta
+      name="twitter:description"
+      content="Explore Amit Yadav's web development projects and technical skills."
+    />
+    <!--
+      Site deploy hone ke baad ye 3 lines uncomment karo aur apna real URL daalo
+      (og:image ka absolute URL hona zaroori hai, e.g. 1200x630 image):
+
+      <link rel="canonical" href="https://YOUR-SITE-URL/" />
+      <meta property="og:url" content="https://YOUR-SITE-URL/" />
+      <meta property="og:image" content="https://YOUR-SITE-URL/og-image.jpg" />
+    -->
 
     <title>Amit Yadav | Full Stack Developer</title>
+
+    <!-- Favicon (inline, no extra file needed) -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050505'/%3E%3Ctext x='50%25' y='54%25' font-family='Arial' font-size='30' font-weight='700' fill='white' text-anchor='middle' dominant-baseline='middle'%3EAY%3C/text%3E%3C/svg%3E"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,10 +52,18 @@
     />
     <link rel="stylesheet" href="style.css" />
 
-    <script
-      defer
-      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
-    ></script>
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Amit Yadav",
+        "jobTitle": "Full Stack Developer",
+        "sameAs": ["https://github.com/ay583991-sketch"]
+      }
+    </script>
+
+    <!-- Three.js ab main.js se lazy-load hota hai (page fast rahega) -->
     <script defer src="main.js"></script>
   </head>
 
@@ -71,12 +102,12 @@
 
     <main id="main-content">
       <!-- Hero -->
-      <section id="hero" aria-labelledby="hero-title">
+      <section id="hero" class="section" aria-labelledby="hero-title">
         <div class="hero-layout">
           <div class="hero-content">
             <p class="eyebrow">Hello, I'm</p>
             <h1 id="hero-title">Amit Yadav</h1>
-            <h2>Full Stack Developer &amp; Student</h2>
+            <p class="hero-subtitle">Full Stack Developer &amp; Student</p>
 
             <p class="hero-description">
               Passionate about building modern web applications, learning
@@ -87,6 +118,13 @@
             <div class="btn-group">
               <a href="#projects" class="btn btn-primary">Explore Work</a>
               <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+              <!--
+                Resume ready ho to ye uncomment karo (resume.pdf same folder me rakho):
+                <a href="resume.pdf" download class="btn btn-secondary">
+                  <i class="fa-solid fa-download" aria-hidden="true"></i>
+                  Download CV
+                </a>
+              -->
             </div>
           </div>
 
@@ -95,14 +133,17 @@
             <img
               src="profile.jpg"
               alt="Amit Yadav standing beside a car"
+              width="350"
+              height="440"
               fetchpriority="high"
+              decoding="async"
             />
           </div>
         </div>
       </section>
 
       <!-- About -->
-      <section id="about" aria-labelledby="about-title">
+      <section id="about" class="section" aria-labelledby="about-title">
         <h2 class="section-title" id="about-title">About <span>Me</span></h2>
 
         <div class="about-grid">
@@ -142,7 +183,7 @@
       </section>
 
       <!-- Skills -->
-      <section id="skills" aria-labelledby="skills-title">
+      <section id="skills" class="section" aria-labelledby="skills-title">
         <h2 class="section-title" id="skills-title">My <span>Skills</span></h2>
 
         <div class="skills-container">
@@ -184,7 +225,7 @@
       </section>
 
       <!-- Projects -->
-      <section id="projects" aria-labelledby="projects-title">
+      <section id="projects" class="section" aria-labelledby="projects-title">
         <h2 class="section-title" id="projects-title">
           Featured <span>Projects</span>
         </h2>
@@ -193,22 +234,39 @@
           <article class="project-card">
             <div class="project-info">
               <p class="project-kicker">Web application</p>
-              <h3>Resume Generator</h3>
+              <h3>Forma-Resume-Studio</h3>
               <p>
                 A web tool to build and generate professional resumes quickly
                 with clean formatting and layout structure.
               </p>
+              <!-- Tags apne project ke hisaab se edit kar lena -->
+              <ul class="tag-list" aria-label="Technologies used">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+              </ul>
             </div>
 
-            <a
-              href="https://ay583991-sketch.github.io/resume-generate/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="project-link"
-            >
-              View Live Project
-              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-            </a>
+            <div class="project-links">
+              <a
+                href="https://ay583991-sketch.github.io/Forma-Resume-Studio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link"
+              >
+                View Live Project
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+              <a
+                href="https://ay583991-sketch.github.io/Forma-Resume-Studio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link project-link--ghost"
+              >
+                <i class="fa-brands fa-github" aria-hidden="true"></i>
+                Source Code
+              </a>
+            </div>
           </article>
 
           <article class="project-card">
@@ -219,17 +277,33 @@
                 An automotive landing page featuring responsive design and
                 immersive visual styling.
               </p>
+              <ul class="tag-list" aria-label="Technologies used">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>Responsive</li>
+              </ul>
             </div>
 
-            <a
-              href="https://ay583991-sketch.github.io/scorpio-landing-page/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="project-link"
-            >
-              View Live Project
-              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-            </a>
+            <div class="project-links">
+              <a
+                href="https://ay583991-sketch.github.io/scorpio-landing-page/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link"
+              >
+                View Live Project
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+              <a
+                href="https://github.com/ay583991-sketch/scorpio-landing-page"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link project-link--ghost"
+              >
+                <i class="fa-brands fa-github" aria-hidden="true"></i>
+                Source Code
+              </a>
+            </div>
           </article>
 
           <article class="project-card">
@@ -240,23 +314,39 @@
                 An earlier iteration of my personal portfolio showcasing initial
                 projects and development progress.
               </p>
+              <ul class="tag-list" aria-label="Technologies used">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+              </ul>
             </div>
 
-            <a
-              href="https://ay583991-sketch.github.io/amit-portfolio01/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="project-link"
-            >
-              View Live Project
-              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-            </a>
+            <div class="project-links">
+              <a
+                href="https://ay583991-sketch.github.io/amit-portfolio01/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link"
+              >
+                View Live Project
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              </a>
+              <a
+                href="https://github.com/ay583991-sketch/amit-portfolio01"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="project-link project-link--ghost"
+              >
+                <i class="fa-brands fa-github" aria-hidden="true"></i>
+                Source Code
+              </a>
+            </div>
           </article>
         </div>
       </section>
 
       <!-- Contact: direct email and GitHub only; no form -->
-      <section id="contact" aria-labelledby="contact-title">
+      <section id="contact" class="section" aria-labelledby="contact-title">
         <h2 class="section-title" id="contact-title">
           Get In <span>Touch</span>
         </h2>
@@ -284,6 +374,19 @@
                 <i class="fa-brands fa-github" aria-hidden="true"></i>
                 <span>github.com/ay583991-sketch</span>
               </a>
+
+              <!--
+                LinkedIn banao to ye uncomment karo aur URL badlo:
+                <a
+                  href="https://www.linkedin.com/in/YOUR-USERNAME/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="contact-item"
+                >
+                  <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+                  <span>LinkedIn</span>
+                </a>
+              -->
             </div>
 
             <a
