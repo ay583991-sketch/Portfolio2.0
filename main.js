@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
   // ==========================================
   // 1. RESPONSIVE MOBILE NAVIGATION
   // ==========================================
@@ -13,40 +15,32 @@
     if (!navToggle || !navLinks) return;
 
     navToggle.setAttribute("aria-expanded", String(open));
-
     navToggle.setAttribute(
       "aria-label",
       open ? "Close navigation menu" : "Open navigation menu",
     );
-
     navLinks.classList.toggle("is-open", open);
   }
 
   if (navToggle && navLinks) {
     navToggle.addEventListener("click", () => {
       const isOpen = navToggle.getAttribute("aria-expanded") === "true";
-
       setMenuOpen(!isOpen);
     });
 
     // Close after selecting a navigation link.
     navLinks.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        setMenuOpen(false);
-      });
+      link.addEventListener("click", () => setMenuOpen(false));
     });
 
     // Close with Escape.
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        const wasOpen = navToggle.getAttribute("aria-expanded") === "true";
+      if (event.key !== "Escape") return;
 
-        setMenuOpen(false);
+      const wasOpen = navToggle.getAttribute("aria-expanded") === "true";
+      setMenuOpen(false);
 
-        if (wasOpen) {
-          navToggle.focus();
-        }
-      }
+      if (wasOpen) navToggle.focus();
     });
 
     // Close when clicking outside the menu.
@@ -63,9 +57,7 @@
     });
 
     // Reset the menu when crossing the mobile breakpoint.
-    const handleBreakpointChange = () => {
-      setMenuOpen(false);
-    };
+    const handleBreakpointChange = () => setMenuOpen(false);
 
     if (mobileQuery.addEventListener) {
       mobileQuery.addEventListener("change", handleBreakpointChange);
@@ -85,11 +77,70 @@
   }
 
   // ==========================================
-  // 3. OPTIMIZED THREE.JS BACKGROUND
+  // 3. ACTIVE NAV LINK (SCROLLSPY)
   // ==========================================
 
+  if ("IntersectionObserver" in window) {
+    const spyLinks = document.querySelectorAll(".nav-links a[href^='#']");
+    const spySections = document.querySelectorAll("main section[id]");
+
+    const spyObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          spyLinks.forEach((link) => {
+            if (link.getAttribute("href") === "#" + entry.target.id) {
+              link.setAttribute("aria-current", "location");
+            } else {
+              link.removeAttribute("aria-current");
+            }
+          });
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+
+    spySections.forEach((section) => spyObserver.observe(section));
+  }
+
+  // ==========================================
+  // 4. SCROLL REVEAL ANIMATION
+  // ==========================================
+
+  if ("IntersectionObserver" in window && !reduceMotion.matches) {
+    const revealTargets = document.querySelectorAll(
+      ".about-text, .about-card, .skill-box, .project-card, .contact-info-box",
+    );
+
+    const revealObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+    );
+
+    revealTargets.forEach((el, index) => {
+      el.classList.add("reveal");
+      // Siblings ek ke baad ek aayein (chhota stagger)
+      el.style.transitionDelay = `${(index % 4) * 70}ms`;
+      revealObserver.observe(el);
+    });
+  }
+
+  // ==========================================
+  // 5. THREE.JS BACKGROUND (LAZY-LOADED)
+  // ==========================================
+
+  const THREE_URL =
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+
   const container = document.getElementById("canvas-container");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let renderer = null;
   let scene = null;
@@ -107,6 +158,9 @@
   let mouseY = 0;
   let currentMouseX = 0;
   let currentMouseY = 0;
+
+  let lastWidth = window.innerWidth;
+  let resizeFrame = 0;
 
   function stopAnimation() {
     if (animationId) {
@@ -154,13 +208,11 @@
 
     // Icosahedron rotation.
     icosahedron.rotation.x += (desiredX - icosahedron.rotation.x) * 0.035;
-
     icosahedron.rotation.y +=
       (elapsed * 0.15 + desiredY - icosahedron.rotation.y) * 0.035;
 
     // Torus rotation.
     torus.rotation.x += (elapsed * 0.08 - torus.rotation.x) * 0.025;
-
     torus.rotation.y += (elapsed * -0.1 + desiredX - torus.rotation.y) * 0.025;
 
     renderer.render(scene, camera);
@@ -188,21 +240,29 @@
     }
   }
 
+  // Resize: sirf width badalne par, aur requestAnimationFrame se throttle.
+  // (Mobile par address bar hide/show hone se height badalti hai, wahan skip.)
   function handleResize() {
     if (!renderer || !camera) return;
+    if (window.innerWidth === lastWidth) return;
+    if (resizeFrame) return;
 
-    camera.aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+    resizeFrame = requestAnimationFrame(() => {
+      resizeFrame = 0;
+      lastWidth = window.innerWidth;
 
-    camera.updateProjectionMatrix();
+      camera.aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+      camera.updateProjectionMatrix();
 
-    // Limit high-DPI rendering cost.
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderStaticFrame();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderStaticFrame();
+    });
   }
 
-  if (container && window.THREE) {
+  function initBackground() {
+    if (!container || !window.THREE || renderer) return;
+
     try {
       scene = new THREE.Scene();
 
@@ -212,7 +272,6 @@
         0.1,
         1000,
       );
-
       camera.position.z = 8;
 
       renderer = new THREE.WebGLRenderer({
@@ -222,7 +281,6 @@
       });
 
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.appendChild(renderer.domElement);
 
@@ -236,7 +294,6 @@
           opacity: 0.12,
         }),
       );
-
       scene.add(icosahedron);
 
       // Wireframe torus.
@@ -249,26 +306,24 @@
           opacity: 0.06,
         }),
       );
-
       scene.add(torus);
 
       clock = new THREE.Clock();
 
-      // Mouse interaction.
-      window.addEventListener(
-        "mousemove",
-        (event) => {
-          mouseX = (event.clientX / window.innerWidth - 0.5) * 0.8;
-
-          mouseY = (event.clientY / window.innerHeight - 0.5) * 0.8;
-        },
-        { passive: true },
-      );
+      // Mouse interaction: sirf un devices par jahan hover hota hai.
+      if (window.matchMedia("(hover: hover)").matches) {
+        window.addEventListener(
+          "mousemove",
+          (event) => {
+            mouseX = (event.clientX / window.innerWidth - 0.5) * 0.8;
+            mouseY = (event.clientY / window.innerHeight - 0.5) * 0.8;
+          },
+          { passive: true },
+        );
+      }
 
       // Responsive canvas.
-      window.addEventListener("resize", handleResize, {
-        passive: true,
-      });
+      window.addEventListener("resize", handleResize, { passive: true });
 
       // Pause animation while the tab is hidden.
       document.addEventListener("visibilitychange", () => {
@@ -288,7 +343,20 @@
         reduceMotion.addListener(handleMotionPreference);
       }
 
+      // WebGL context lost/restored (GPU reset, low memory, etc.).
+      renderer.domElement.addEventListener("webglcontextlost", (event) => {
+        event.preventDefault();
+        stopAnimation();
+      });
+
+      renderer.domElement.addEventListener("webglcontextrestored", () => {
+        handleMotionPreference();
+      });
+
       handleMotionPreference();
+
+      // Smooth fade-in.
+      requestAnimationFrame(() => container.classList.add("is-ready"));
     } catch (error) {
       // Keep the website usable if WebGL is unavailable.
       console.warn("3D background could not be initialized:", error);
@@ -301,6 +369,40 @@
       }
 
       renderer = null;
+    }
+  }
+
+  function loadThree() {
+    const script = document.createElement("script");
+    script.src = THREE_URL;
+    script.async = true;
+    script.onload = initBackground;
+    script.onerror = () => {
+      console.warn("Three.js could not be loaded; continuing without 3D.");
+    };
+    document.head.appendChild(script);
+  }
+
+  function scheduleThree() {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(loadThree, { timeout: 2500 });
+    } else {
+      setTimeout(loadThree, 1500);
+    }
+  }
+
+  // Heavy library sirf tab load karo jab zaroori ho:
+  // - reduced motion off ho
+  // - Data Saver off ho
+  // - screen chhoti (phone) na ho
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+  const isSmallScreen = window.innerWidth <= 600;
+
+  if (container && !reduceMotion.matches && !saveData && !isSmallScreen) {
+    if (document.readyState === "complete") {
+      scheduleThree();
+    } else {
+      window.addEventListener("load", scheduleThree, { once: true });
     }
   }
 })();
