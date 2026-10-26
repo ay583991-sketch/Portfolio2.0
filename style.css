@@ -9,6 +9,8 @@
   --text-primary: #ffffff;
   --text-secondary: #a0a0a0;
   --border-color: rgba(255, 255, 255, 0.12);
+  --border-hover: rgba(255, 255, 255, 0.65);
+  --white: #ffffff;
   --focus-color: #ffffff;
   --nav-height: 78px;
   --content-width: 1440px;
@@ -27,16 +29,26 @@ html {
   scroll-padding-top: calc(var(--nav-height) + 18px);
   overflow-x: clip;
 
-  /* Hide scrollbar but keep scrolling enabled */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  /* Thin, subtle scrollbar (hidden nahi, taaki user ko progress dikhe) */
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3a var(--bg-color);
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
+html::-webkit-scrollbar {
+  width: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 8px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
 }
 
 body {
@@ -46,21 +58,17 @@ body {
   max-width: 100%;
   background: var(--bg-color);
   color: var(--text-primary);
-  font-family: "Poppins", sans-serif;
+  font-family:
+    "Poppins",
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   line-height: 1.6;
   overflow-x: clip;
 }
 
-body,
-input,
-textarea,
 button {
-  font-family: "Poppins", sans-serif;
-}
-
-button,
-input,
-textarea {
   font: inherit;
 }
 
@@ -79,7 +87,7 @@ img {
   height: auto;
 }
 
-section {
+.section {
   width: 100%;
   max-width: var(--content-width);
   min-width: 0;
@@ -90,6 +98,12 @@ section {
   flex-direction: column;
   justify-content: center;
   scroll-margin-top: calc(var(--nav-height) + 12px);
+}
+
+/* Below-the-fold sections ko browser lazily render karega (faster load) */
+.section:not(#hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
 }
 
 .section-title {
@@ -144,6 +158,12 @@ button:focus-visible {
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+#canvas-container.is-ready {
+  opacity: 1;
 }
 
 #canvas-container canvas {
@@ -216,6 +236,7 @@ footer {
 }
 
 .nav-links a {
+  position: relative;
   display: inline-flex;
   min-height: 44px;
   align-items: center;
@@ -225,9 +246,28 @@ footer {
   transition: color 0.2s ease;
 }
 
+/* Active link ke neeche chhoti underline */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 8px;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--white);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
 .nav-links a:hover,
 .nav-links a[aria-current="location"] {
   color: var(--text-primary);
+}
+
+.nav-links a[aria-current="location"]::after {
+  transform: scaleX(1);
 }
 
 .nav-toggle {
@@ -315,7 +355,7 @@ footer {
   overflow-wrap: anywhere;
 }
 
-.hero-content h2 {
+.hero-subtitle {
   margin: 0 0 22px;
   color: var(--text-secondary);
   font-size: clamp(1.15rem, 2.5vw, 1.5rem);
@@ -403,7 +443,7 @@ footer {
 }
 
 .btn-secondary:hover {
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: var(--border-hover);
 }
 
 /* =========================================
@@ -448,7 +488,7 @@ footer {
   width: 20px;
   flex-shrink: 0;
   margin-top: 5px;
-  color: #fff;
+  color: var(--white);
 }
 
 /* =========================================
@@ -475,12 +515,12 @@ footer {
 
 .skill-box:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.65);
+  border-color: var(--border-hover);
 }
 
 .skill-box i {
   margin-bottom: 14px;
-  color: #fff;
+  color: var(--white);
   font-size: 2.35rem;
 }
 
@@ -519,7 +559,7 @@ footer {
 
 .project-card:hover {
   transform: translateY(-5px);
-  border-color: rgba(255, 255, 255, 0.65);
+  border-color: var(--border-hover);
 }
 
 .project-kicker {
@@ -539,28 +579,62 @@ footer {
   overflow-wrap: anywhere;
 }
 
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  padding: 3px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+}
+
 .project-link {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  align-self: flex-start;
-  color: #fff;
+  min-height: 44px;
+  color: var(--white);
   font-size: 0.95rem;
   font-weight: 500;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
 
+.project-link--ghost {
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.project-link--ghost:hover {
+  color: var(--text-primary);
+}
+
 .project-link i {
   transition: transform 0.2s ease;
 }
 
-.project-link:hover i {
+.project-link:hover i.fa-arrow-right {
   transform: translateX(4px);
 }
 
 /* =========================================
-   10. CONTACT — NO FORM
+   10. CONTACT (NO FORM)
 ========================================= */
 
 .contact-container {
@@ -645,16 +719,22 @@ footer p {
 }
 
 /* =========================================
-   12. HIDE WEBSITE SIDEBARS
+   12. SCROLL REVEAL
+   (.reveal class JS add karta hai, isliye
+   JS band ho to content hidden nahi hoga)
 ========================================= */
 
-.sidebar,
-.side-bar,
-#sidebar,
-aside.sidebar,
-.mobile-sidebar,
-.sidebar-overlay {
-  display: none !important;
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
 /* =========================================
@@ -714,7 +794,16 @@ aside.sidebar,
     padding: 10px 0;
   }
 
-  section {
+  .nav-links a::after {
+    display: none;
+  }
+
+  .nav-links a[aria-current="location"] {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .section {
     min-height: auto;
     padding: 84px 6% 64px;
   }
@@ -750,7 +839,7 @@ aside.sidebar,
     letter-spacing: -1.4px;
   }
 
-  .hero-content h2 {
+  .hero-subtitle {
     font-size: clamp(1.1rem, 4vw, 1.4rem);
   }
 
@@ -789,7 +878,7 @@ aside.sidebar,
     padding-inline: 5%;
   }
 
-  section {
+  .section {
     padding-inline: 6%;
   }
 
@@ -839,6 +928,11 @@ aside.sidebar,
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 
   *,
